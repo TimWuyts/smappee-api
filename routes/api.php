@@ -18,6 +18,9 @@ Route::controller(SmappeeController::class)->group(function() {
     Route::get('/measurements', 'measurements');
     Route::get('/measurements/{key}', 'measurement');
 
+    Route::get('/total/load', 'totalLoad');
+    Route::get('/total/solar', 'totalSolar');
+
     Route::get('/sockets', 'sockets');
     Route::get('/sockets/{key}/{action}', 'socket');
 
