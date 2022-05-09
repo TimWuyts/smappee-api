@@ -45,21 +45,26 @@ class SmappeeController extends Controller
         return $this->getCombinedValue($measurements, ['phase3ActivePower', 'phase4ActivePower', 'phase5ActivePower']);
     }
 
+    public function totalCombined(Request $request)
+    {
+        return 'load=' . $this->totalLoad($request) . ';solar=' . $this->totalSolar($request);
+    }
+
     protected function getCombinedValue($measurements, $keys)
     {
         $measurements = $measurements->filter(function($measurement) use($keys) {
             return in_array($measurement['key'], $keys);
         });
 
-        return max($measurements->sum('value'), 0);
+        return max(($measurements->sum('value') / 1000), 0);
     }
 
-    public function sockets(Request $request)
+    public function listSockets(Request $request)
     {
         return $this->doPost('commandControlPublic', 'load')->json();
     }
 
-    public function socket(Request $request, $key, $action = 'off')
+    public function toggleSocket(Request $request, $key, $action = 'off')
     {
         $action = strtoupper($action);
 

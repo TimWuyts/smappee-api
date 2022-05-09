@@ -20,9 +20,10 @@ Route::controller(SmappeeController::class)->group(function() {
 
     Route::get('/total/load', 'totalLoad');
     Route::get('/total/solar', 'totalSolar');
+    Route::get('/total/combined', 'totalCombined');
 
-    Route::get('/sockets', 'sockets');
-    Route::get('/sockets/{key}/{action}', 'socket');
+    Route::get('/sockets', 'listSockets');
+    Route::get('/sockets/{key}/{action?}', 'toggleSocket');
 
     Route::get('/system', 'system');
 });
