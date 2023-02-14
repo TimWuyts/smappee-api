@@ -15,15 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::controller(SmappeeController::class)->group(function() {
-    Route::get('/measurements', 'measurements');
-    Route::get('/measurements/{key}', 'measurement');
-
-    Route::get('/total/load', 'totalLoad');
-    Route::get('/total/solar', 'totalSolar');
-    Route::get('/total/combined', 'totalCombined');
-
-    Route::get('/sockets', 'listSockets');
-    Route::get('/sockets/{key}/{action?}', 'toggleSocket');
-
-    Route::get('/system', 'system');
+    Route::get('/service-locations', 'getServiceLocations');
+    Route::get('/service-location/{id?}', 'getServiceLocation');
+    Route::get('/consumption/{id?}', 'getConsumption');
 });
