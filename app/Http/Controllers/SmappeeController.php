@@ -43,7 +43,7 @@ class SmappeeController extends Controller
     {
         $jsonResponse = $this->handleResponseType($request);
 
-        return $this->doGet('servicelocation', $jsonResponse);
+        return $this->doGet('servicelocation', null, $jsonResponse);
     }
 
     public function getServiceLocation(Request $request, $serviceLocationId = null)

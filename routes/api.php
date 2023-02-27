@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LocalSmappeeController;
 use App\Http\Controllers\SmappeeController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,8 +15,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::controller(SmappeeController::class)->group(function() {
-    Route::get('/service-locations', 'getServiceLocations');
-    Route::get('/service-location/{id?}', 'getServiceLocation');
-    Route::get('/consumption/{id?}', 'getConsumption');
-});
+Route::controller(SmappeeController::class)
+    ->group(function() {
+        Route::get('/service-locations', 'getServiceLocations');
+        Route::get('/service-location/{id?}', 'getServiceLocation');
+        Route::get('/consumption/{id?}', 'getConsumption');
+    });
+
+Route::controller(LocalSmappeeController::class)
+    ->prefix('local')
+    ->name('local.')
+    ->group(function() {
+        Route::get('/system', 'system');
+        Route::get('/sockets', 'listSockets');
+        Route::get('/sockets/{key}/{action?}', 'toggleSocket');
+    });
