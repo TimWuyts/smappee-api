@@ -1,64 +1,68 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Smappee API
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A small Laravel based API wrapper for (local) Smappee devices, used to run on local server in order to proxy requests to other clients/devices.
 
-## About Laravel
+## Initialisation
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### REST API & MQTT access
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Local API access to your Smappee device is possible by default, however the provided information is limited.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+An MQTT client [can be enabled](https://support.smappee.com/hc/en-gb/articles/360045278392-Can-I-get-access-to-the-data-via-MQTT-) from within the local device configuration.
 
-## Learning Laravel
+Access to the [Smappee REST API](https://smappee.atlassian.net/wiki/spaces/DEVAPI/overview) is not available by default, but [can be requested](https://support.smappee.com/hc/en-gb/articles/360045704651-Can-I-get-access-to-the-data-via-API-) by contacting the support team.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Rename the `.env.example` file to `.env` & provide the proper information.
 
-## Laravel Sponsors
+2. Run `composer install` in the root of the project, which installs all required dependencies.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+3. Make sure the Laravel scheduler is [run using a cronjob](https://laravel.com/docs/10.x/scheduling#running-the-scheduler). 
 
-### Premium Partners
+Your server configuration should meet the [requirements](https://laravel.com/docs/10.x/deployment#server-requirements) as specified in the documentation of the Laravel framework.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Overview
 
-## Contributing
+### Endpoints
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The following routes are available as GET requests, which are essentially proxying the available (local) API endpoints.
 
-## Code of Conduct
+`/local/system`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+An overview of parameters exposed by your local Smappee device.
 
-## Security Vulnerabilities
+`/local/sockets`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+An overview of sockets connected to your local Smappee device.
 
-## License
+`/local/sockets/{key}/{action?}`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Trigger a specific action ("on" or "off") for a socket, using the "key" as unique identifier. The "off" action is set as the default.
+
+`/service-locations`
+
+An overview of the available service locations related to your account.
+
+`/service-location/{id?}`
+
+Detailed information for a certain service-location, using the id as unique identifier. This parameter is optional when the "SMAPPEE_SERVICE_LOCATION" environment variable is set.
+
+`/consumption/{id?}`
+
+Consumption information for a certain service-location, using the id as unique identifier. This parameter is optional when the "SMAPPEE_SERVICE_LOCATION" environment variable is set.
+
+The following optional query parameters can be used:
+
+- **from**: DateTime compatible start date, defaults to "-1 day".
+- **to**: DateTime compatible end date, defaults to "now".
+- **aggregation**: Numeric value of the [aggregation level](https://smappee.atlassian.net/wiki/spaces/DEVAPI/pages/526581813/Get+Electricity+Consumption), defaults to "2" (hourly values).
+
+
+### MQTT
+
+When enabled, an `extensions` topic will be created in the same namespace as the default MQTT topics provided by your Smappee device with additional information about the service location & current consumption.
+
+This information will be updated every 5 minutes using a scheduled task that triggers the `mqtt:publish` artisan command.
+
+Additional MQTT related [configuration](https://github.com/php-mqtt/laravel-client/blob/master/config/mqtt-client.php) is possible using environment variables.
